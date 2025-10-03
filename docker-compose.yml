@@ -1,0 +1,37 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ticinema
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: codegym
+      MYSQL_DATABASE: ticinema
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build: ./ticinema_server
+    container_name: spring_backend
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ticinema
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: codegym
+    depends_on:
+      - mysql
+
+  frontend:
+    build: ./ticinema_client
+    container_name: react_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data:
